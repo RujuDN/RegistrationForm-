@@ -37,7 +37,7 @@ namespace RegistrationFormWeb.Controllers
             return Json(cityList, JsonRequestBehavior.AllowGet);
         }
        
-        [HttpDelete]
+        [HttpPost]
         public ActionResult DeleteDetail(int id)
         {
             bool deleted = registerDAL.Deletedetail(id);

@@ -47,6 +47,14 @@
         });
     });
 
+    jQuery("#Phone").on("keypress", function () {
+        var regex = /^[6-9]{1}[0-9]{9}$/;
+        if (regex.test($("#Phone").val())) {
+            $("#Phone").css("border", "1px solid #00000036");
+        } else {
+            $("#Phone").css("border", "1px solid red");
+        }
+    });
 });
 
 function GetAllDetails() {
@@ -67,10 +75,12 @@ function GetAllDetails() {
                     html += '<td>' + item.Address + '</td>';
                     html += '<td>' + item.StateName + '</td>';
                     html += '<td>' + item.CityName + '</td>';
-                    html += '<td><a href="#" onclick="return getDetailByID(' + item.Id + ')">Edit</a> | <a href="#" onclick="DeleteDetail(' + item.Id + ')">Delete</a></td>';
+                    html += '<td><a href="#" class="btn btn-primary" onclick="return getDetailByID(' + item.Id + ')">Edit</a> | <a href="#" class="btn btn-warning" onclick="DeleteDetail(' + item.Id + ')">Delete</a></td>';
                     html += '</tr>';
                 });
                 jQuery('.tbody').html(html);
+            } else {
+                jQuery('.tbody').empty();
             }
         },
         error: function (errormessage) {
@@ -104,9 +114,9 @@ function InsertUpdateDetail() {
             success: function (result) {
                 if (result == true) {
                     if (regiObj.Id == 0) {
-                        toastr.success('Yes! You have successfully completed your task!', 'Congratulation for you, Mahedee!');
+                        toastr.success('Detail Inserted Successfully!');
                     } else {
-                        toastr.success('Yes! You have successfully completed your task!', 'Congratulation for you, Mahedee!');
+                        toastr.success('Detail Updated Successfulyy!');
                     }
                 }
                 GetAllDetails();
@@ -136,12 +146,18 @@ function getDetailByID(Id) {
             jQuery('#hdnID').val(result.Id);
             jQuery('#Name').val(result.Name);
             jQuery('#Age').val(result.Age);
-            jQuery('#State').val(result.State);
-            jQuery('#Country').val(result.Country);
-
+            jQuery('#state-dropdown').val(result.StateId);
+            jQuery('#state-dropdown').trigger("change");            
+            jQuery('#Email').val(result.Email);
+            jQuery('#Address').val(result.Address);
+            jQuery('#Phone').val(result.Phone);
+            setTimeout(function(){
+                jQuery('#city-dropdown').val(result.CityId);
+            }, 2000);
             jQuery('#registrationFormModal').modal('show');
             jQuery('#btnUpdate').show();
-            jQuery('#btnSubmit').hide();
+            jQuery('#btnSubmit').text('Update');
+            jQuery('#agree').attr("checked", true);
         },
         error: function (errormessage) {
             alert(errormessage.responseText);
@@ -150,16 +166,21 @@ function getDetailByID(Id) {
     return false;
 }
 
-function DeleteDetail(ID) {
+function DeleteDetail(Id) {
     var ans = confirm("Are you sure you want to delete this Record?");
     if (ans) {
         jQuery.ajax({
-            url: "/RegisterForm/DeleteDetail/" + ID,
+            url: "/RegisterForm/DeleteDetail/" + Id,
             type: "POST",
             contentType: "application/json;charset=UTF-8",
             dataType: "json",
             success: function (result) {
-                GetAllDetails();
+                if (result == true) {
+                    toastr.success('Detail Deleted Successfully!');
+                    GetAllDetails();
+                } else {
+                    toastr.error('There is some error in delete process!');
+                }               
             },
             error: function (errormessage) {
                 alert(errormessage.responseText);
@@ -172,10 +193,12 @@ function clearTextBox() {
     jQuery('#hdnID').val(0);
     jQuery('#Name').val("");
     jQuery('#Age').val("");
-    jQuery('#State').val("");
-    jQuery('#Country').val("");
-    jQuery('#btnUpdate').hide();
-    jQuery('#btnSubmit').show();
+    jQuery('#Email').val("");
+    jQuery('#Phone').val("");
+    jQuery('#Address').val("");
+    jQuery('#state-dropdown').val("");
+    jQuery('#city-dropdown').val("");
+    jQuery('#btnSubmit').text('Add');
     jQuery('#Name').css('border-color', 'lightgrey');
     jQuery('#Age').css('border-color', 'lightgrey');
     jQuery('#State').css('border-color', 'lightgrey');
@@ -220,16 +243,6 @@ function validate() {
     else {
         jQuery('#Age').css('border-color', 'lightgrey');
     }
-
-    if (jQuery('#Phone').val()?.trim() == "") {
-        jQuery('#Phone').css('border-color', 'Red');
-        isValid = false;
-    }
-    else {
-        checkPhone(jQuery('#Phone'));
-        jQuery('#Phone').css('border-color', 'lightgrey');
-    }
-
     if (jQuery('#state-dropdown').val()?.trim() == "") {
         jQuery('#state-dropdown').css('border-color', 'Red');
         isValid = false;
@@ -252,28 +265,4 @@ function validateEmail(email) {
 
     return $.trim(email).match(pattern) ? true : false;
 }
-function formatPhone(obj) {
-    var numbers = obj.value.replace(/\D/g, ''),
-        char = { 0: '(', 3: ') ', 6: ' - ' };
-    obj.value = '';
-    for (var i = 0; i < numbers.length; i++) {
-        obj.value += (char[i] || '') + numbers[i];
-    }
-}
 
-function checkPhone(phoneInput) {
-    var formatted = phoneInput.val().replace(/\D/g, '');
-    if (formatted.length !== 10) {
-        jQuery('#Phone').css({
-            color: "red",
-            border: "1px solid red"
-        });
-
-    } else {
-        jQuery('#Phone').css({
-            background: "transparent",
-            color: "black",
-            border:"1px solid #ced4da"
-        });
-    }
-}

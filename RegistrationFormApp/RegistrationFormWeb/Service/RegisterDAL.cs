@@ -34,8 +34,8 @@ namespace RegistrationFormWeb.Service
                     Address = dr["Address"].ToString(),
                     Email = dr["email"].ToString(),
                     Phone = dr["Phone"].ToString(),
-                    StateName = Convert.ToInt32(dr["StateName"]),
-                    CityName = Convert.ToInt32(dr["CityName"])
+                    StateName = dr["StateName"].ToString(),
+                    CityName = dr["CityName"].ToString() 
                 });
             }
             return list;

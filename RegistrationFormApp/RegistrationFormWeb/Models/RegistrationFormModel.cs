@@ -12,8 +12,8 @@ namespace RegistrationFormWeb.Models
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Address { get; set; }
-        public int StateName { get; set; }
-        public int CityName { get; set; }
+        public string StateName { get; set; }
+        public string CityName { get; set; }
 
     }
     public class RegistrationFormInsertModel
